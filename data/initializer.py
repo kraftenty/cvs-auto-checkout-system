@@ -15,10 +15,12 @@ def initialize():
     # Create user table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS sales (
-            id INTEGER PRIMARY KEY NOT NULL,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             amount INTEGER NOT NULL,
             payment_method VARCHAR NOT NULL,
-            timestamp DATE NOT NULL
+            year INTEGER NOT NULL,
+            month INTEGER NOT NULL,
+            day INTEGER NOT NULL
         );
     ''')
 

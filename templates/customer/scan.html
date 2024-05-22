@@ -3,34 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <title>편의점 자동 계산 시스템</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <style>
+        .payment-method {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .payment-method input[type="radio"] {
+            display: none;
+        }
+        .payment-method label {
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.5em;
+        }
+        .payment-method input[type="radio"]:checked + label {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .disabled-button {
+            background-color: #cccccc;
+            border-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+        .quantity-control button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            font-size: 1em;
+        }
+    </style>
 </head>
 <body>
     <h1>상품 스캔</h1>
     <hr>
-    <table id="product-table">
-        <!--여기에 실시간으로 스캔된 상품이 쭉 나옴-->
+    <table id="item-table">
+        <thead>
+            <tr>
+                <th>상품명</th>
+                <th>가격</th>
+                <th>수량</th>
+                <th>조작</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--여기에 실시간으로 스캔된 상품이 쭉 나옴-->
+        </tbody>
     </table>
     <hr>
-    <a href="/customer/payment"><button>결제하기</button></a>
+    <div>
+        <strong>총 가격: </strong><span id="total-price">0</span>원
+    </div>
+    <hr>
+    <div class="payment-method">
+        <input type="radio" id="creditcard" name="payment_method" value="creditcard" checked>
+        <label for="creditcard">신용카드</label>
+        <input type="radio" id="kakaopay" name="payment_method" value="kakaopay">
+        <label for="kakaopay">카카오페이</label>
+        <input type="radio" id="naverpay" name="payment_method" value="naverpay">
+        <label for="naverpay">네이버페이</label>
+    </div>
+    <form id="payment-form" method="post" action="/customer/pay">
+        <input type="hidden" name="total_price" id="total-price-input">
+        <input type="hidden" name="payment_method" id="payment-method-input">
+        <input type="hidden" name="year" id="year-input">
+        <input type="hidden" name="month" id="month-input">
+        <input type="hidden" name="day" id="day-input">
+        <button type="submit" id="submit-button" class="disabled-button" disabled>결제하기</button>
+    </form>
 
     <script>
         const socket = io();
+        let totalPrice = 0; // 총 가격을 저장할 변수
 
-        socket.on('new_product', function(data) {
-            const table = document.getElementById('product-table');
-            const row = table.insertRow();
+        socket.on('connect', function() {
+            console.log('Connected to server');
+        });
+
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+        });
+
+        socket.on('item', function(data) {
+            const tableBody = document.getElementById('item-table').getElementsByTagName('tbody')[0];
+            const row = tableBody.insertRow();
             const cell1 = row.insertCell(0);
             const cell2 = row.insertCell(1);
             const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
 
-            cell1.innerHTML = data.class;
-            cell2.innerHTML = data.confidence;
-            cell3.innerHTML = data.box.join(', ');
+            cell1.innerHTML = data.name;
+            cell2.innerHTML = data.price;
+            cell3.innerHTML = `<div class="quantity-control">
+                <button class="decrease" disabled>-</button>
+                <span class="quantity">1</span>
+                <button class="increase">+</button>
+            </div>`;
+            cell4.innerHTML = '<button class="remove">삭제</button>';
 
-            console.log('New product detected:', data);
+            // 총 가격 업데이트
+            totalPrice += data.price;
+            document.getElementById('total-price').innerText = totalPrice;
+
+            // 결제 버튼 활성화
+            if (totalPrice > 0) {
+                document.getElementById('submit-button').classList.remove('disabled-button');
+                document.getElementById('submit-button').disabled = false;
+            }
+
+            // 버튼 이벤트 핸들러 추가
+            const decreaseButton = cell3.querySelector('.decrease');
+            const increaseButton = cell3.querySelector('.increase');
+            const quantitySpan = cell3.querySelector('.quantity');
+            const removeButton = cell4.querySelector('.remove');
+
+            increaseButton.addEventListener('click', function() {
+                let quantity = parseInt(quantitySpan.innerText);
+                quantity += 1;
+                quantitySpan.innerText = quantity;
+                if (quantity > 1) {
+                    decreaseButton.disabled = false;
+                }
+                totalPrice += data.price;
+                document.getElementById('total-price').innerText = totalPrice;
+            });
+
+            decreaseButton.addEventListener('click', function() {
+                let quantity = parseInt(quantitySpan.innerText);
+                if (quantity > 1) {
+                    quantity -= 1;
+                    quantitySpan.innerText = quantity;
+                    totalPrice -= data.price;
+                    document.getElementById('total-price').innerText = totalPrice;
+                    if (quantity === 1) {
+                        decreaseButton.disabled = true;
+                    }
+                }
+            });
+
+            removeButton.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const quantity = parseInt(quantitySpan.innerText);
+                totalPrice -= data.price * quantity;
+                document.getElementById('total-price').innerText = totalPrice;
+                row.remove();
+
+                if (totalPrice === 0) {
+                    document.getElementById('submit-button').classList.add('disabled-button');
+                    document.getElementById('submit-button').disabled = true;
+                }
+            });
         });
+
+        document.getElementById('payment-form').onsubmit = function(event) {
+            if (totalPrice === 0) {
+                alert('상품이 스캔되지 않았습니다.');
+                event.preventDefault();
+                return;
+            }
+
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            // 가격 
+            document.getElementById('total-price-input').value = totalPrice;
+            // 결제 수단
+            document.getElementById('payment-method-input').value = paymentMethod;
+            // 날짜
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('year-input').value = year;
+            document.getElementById('month-input').value = month;
+            document.getElementById('day-input').value = day;
+        };
     </script>
 </body>
 </html>

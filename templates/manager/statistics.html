@@ -7,7 +7,62 @@
 </head>
 <body>
     <h1>월별 매출 통계</h1>
+    <form method="get" action="/statistics">
+        <!-- 년 선택 -->
+        <label for="year">년:</label>
+        <select id="year" name="year">
+            <script>
+                const currentYear = new Date().getFullYear();
+                const selectedYear = {{ selected_year|default('currentYear') }};
+                for (let year = currentYear - 10; year <= currentYear + 10; year++) {
+                    document.write(`<option value="${year}" ${year == selectedYear ? 'selected' : ''}>${year}</option>`);
+                }
+            </script>
+        </select>
+        
+        <!-- 월 선택 -->
+        <label for="month">월:</label>
+        <select id="month" name="month">
+            <script>
+                const currentMonth = new Date().getMonth() + 1;
+                const selectedMonth = {{ selected_month|default('currentMonth') }};
+                for (let month = 1; month <= 12; month++) {
+                    document.write(`<option value="${month}" ${month == selectedMonth ? 'selected' : ''}>${month}</option>`);
+                }
+            </script>
+        </select>
+
+        <input type="submit" value="조회">
+    </form>
     <hr>
+
+    <table id="results-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Year</th>
+                <th>Month</th>
+                <th>Day</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if results %}
+                {% for row in results %}
+                    <tr>
+                        <td>{{ row[0] }}</td>
+                        <td>{{ row[1] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td>{{ row[3] }}</td>
+                        <td>{{ row[4] }}</td>
+                        <td>{{ row[5] }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+
     <a href="/"><button>돌아가기</button></a>
 </body>
 </html>
