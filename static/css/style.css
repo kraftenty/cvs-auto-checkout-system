@@ -1,0 +1,85 @@
+body {
+    background-color: #D9F2D0;
+    background-image: url('/static/images/wallpaper.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+button {
+    background-color: rgb(153, 248, 0);
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+    box-shadow: 0 3px #999;
+    width:100px;
+}
+
+.big {
+    width:300px;
+    height: 150px;
+    font-size: 30px;
+}
+
+.middle {
+    width:150px;
+    height: 75px;
+    font-size: 20px;
+}
+
+.long {
+    width: 350px;
+    height: 30px;
+    font-size: 15px;
+}
+
+button:hover {
+    background-color: rgb(52, 96, 132);
+}
+
+button:active {
+    background-color: rgb(52, 96, 132);
+    box-shadow: 0 3px #666;
+    transform: translateY(4px);
+}
+
+hr {
+    border: 1px solid gray;
+    margin-bottom: 25px;
+
+}
+
+p {
+    font-size: 1.5em;
+}
+
+ul li {
+    font-size: 1.25em;
+}
+
+input {
+    width: 150px;
+    padding: 5px;
+    margin: 5px 0;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+input[type="submit"] {
+    background-color: rgb(153, 248, 0);
+    color: black;
+}
+
+select {
+    width: auto;
+    padding: 5px;
+    margin: 5px 0;
+    box-sizing: border-box;
+    border-radius: 5px;
+}

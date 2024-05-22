@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>편의점 자동 계산 시스템</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <h1>상품 스캔</h1>
+    <hr>
+    <table id="product-table">
+        <!--여기에 실시간으로 스캔된 상품이 쭉 나옴-->
+    </table>
+    <hr>
+    <a href="/customer/payment"><button>결제하기</button></a>
+
+    <script>
+        const socket = io();
+
+        socket.on('new_product', function(data) {
+            const table = document.getElementById('product-table');
+            const row = table.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+
+            cell1.innerHTML = data.class;
+            cell2.innerHTML = data.confidence;
+            cell3.innerHTML = data.box.join(', ');
+
+            console.log('New product detected:', data);
+        });
+    </script>
+</body>
+</html>
