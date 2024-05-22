@@ -15,6 +15,4 @@ app.register_blueprint(routes.bp)  # 블루프린트 등록
 detectioner.init_socketio(app)  # 소켓 초기화
 
 if __name__ == '__main__':
-    # Start Flask server
-    # app.run(host='0.0.0.0', debug=True, port=5500)
-    socketio.run(app, host='0.0.0.0', debug=True, port=65535)
+    socketio.run(app, host='0.0.0.0', debug=False, port=65535)

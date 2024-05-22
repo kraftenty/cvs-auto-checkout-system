@@ -25,7 +25,6 @@ def index_login():
         conn = sqlite3.connect('data/data.db')
         cursor = conn.cursor()
 
-
         cursor.execute('SELECT * FROM manager WHERE password = ?', (password,))
         manager = cursor.fetchone()
         cursor.close()
@@ -92,29 +91,14 @@ def customer_start():
     else:
         return render_template('index.html')
     
-# @bp.route('/customer/scan', methods=['GET'])
-# def customer_scan():
-#     if constant.MANAGER_SESSION in session:
-#         # 인식 로직을 별도 스레드로 실행
-#         # 스레드 중복 실행 방지
-#         if not hasattr(bp, 'detection_thread') or not bp.detection_thread.is_alive():
-#             detection_thread = threading.Thread(target=detectioner.detection) # 별도 스레드 지정
-#             detection_thread.daemon = True  # 데몬으로 지정
-#             detection_thread.start() # 스레드 시작
-#         return render_template('customer/scan.html')
-#     else:
-#         return render_template('index.html')
-
-### 시작
-
 @bp.route('/customer/scan', methods=['GET'])
 def customer_scan():
     if constant.MANAGER_SESSION in session:
         # 인식 로직을 별도 스레드로 실행
         # 스레드 중복 실행 방지
         if not hasattr(bp, 'detection_thread') or not bp.detection_thread.is_alive():
-            bp.detection_thread_stop_event = threading.Event()
-            detection_thread = threading.Thread(target=detectioner.detection, args=(bp.detection_thread_stop_event,))
+            detectioner.restart_detection()  # Restart the detection by clearing the stop event
+            detection_thread = threading.Thread(target=detectioner.detection, args=(detectioner.stop_event,))
             detection_thread.daemon = True  # 데몬으로 지정
             detection_thread.start()  # 스레드 시작
             bp.detection_thread = detection_thread
@@ -122,17 +106,10 @@ def customer_scan():
     else:
         return render_template('index.html')
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    if hasattr(bp, 'detection_thread_stop_event'):
-        bp.detection_thread_stop_event.set()
-        if hasattr(bp, 'detection_thread') and bp.detection_thread.is_alive():
-            bp.detection_thread.join()  # 스레드가 안전하게 종료될 때까지 대기
-
-### 여기까지
-    
 @bp.route('/customer/pay', methods=['POST'])
 def pay_creditcard():
+    detectioner.stop_detection()  # Correctly stop the detection loop
+
     if constant.MANAGER_SESSION in session:
         total_price = request.form['total_price']
         payment_method = request.form['payment_method']
@@ -142,7 +119,7 @@ def pay_creditcard():
 
         conn = sqlite3.connect('data/data.db')
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO sales (amount, payment_method, year, month, day) VALUES (?, ?, ?, ?, ?)', (total_price, payment_method, year, month, day, ))
+        cursor.execute('INSERT INTO sales (amount, payment_method, year, month, day) VALUES (?, ?, ?, ?, ?)', (total_price, payment_method, year, month, day))
         conn.commit()
         cursor.close()
 
@@ -168,7 +145,7 @@ def statistics():
         if year and month:
             conn = sqlite3.connect('data/data.db')
             cursor = conn.cursor()
-            cursor.execute('''SELECT * FROM sales WHERE year = ? AND month = ?''', (year, month, ))
+            cursor.execute('''SELECT * FROM sales WHERE year = ? AND month = ?''', (year, month))
             results = cursor.fetchall()
             conn.close()
 
@@ -177,4 +154,3 @@ def statistics():
         return render_template('manager/statistics.html')
     else:
         return render_template('index.html')
-    
