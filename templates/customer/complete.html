@@ -4,11 +4,35 @@
     <meta charset="UTF-8">
     <title>편의점 자동 계산 시스템</title>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        h1 {
+            font-size: 64px;
+        }
+        p {
+            font-size: 48px;
+        }
+        .bottom-right {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+        }
+        .middle {
+            font-size: 18px;
+            padding: 10px 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>계산 완료</h1>
-    <hr>
     <p>이용해 주셔서 감사합니다! 안녕히 가세요.</p>
-    <a href="/customer/start"><button>처음으로</button></a>
+    <a href="/customer/start"><button class="superbig">처음으로</button></a>
 </body>
 </html>

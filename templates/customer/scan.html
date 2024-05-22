@@ -6,80 +6,157 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <style>
+        body {
+            display: grid;
+            grid-template-columns: 70% 30%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent the whole page from scrolling */
+        }
+
+        .left-side {
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+        .right-side {
+            padding: 20px;
+            box-sizing: border-box;
+            border-left: 2px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        table, th, td {
+            border: 1px solid gray;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            font-size: 2.5em;
+        }
+
         .payment-method {
             display: flex;
+            flex-direction: column;
             align-items: center;
             margin: 10px 0;
         }
+
         .payment-method input[type="radio"] {
             display: none;
         }
+
         .payment-method label {
-            margin: 0 10px;
+            margin: 10px 0;
             padding: 10px 20px;
             border: 2px solid #ccc;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1.5em;
+            font-size: 2em;
+            width: 100%;
+            text-align: center;
         }
+
         .payment-method input[type="radio"]:checked + label {
             background-color: #007bff;
             color: white;
             border-color: #007bff;
         }
+
         .disabled-button {
             background-color: #cccccc;
             border-color: #cccccc;
             cursor: not-allowed;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 20px;
         }
+
         .quantity-control {
             display: flex;
             align-items: center;
         }
+
         .quantity-control button {
-            margin: 0 5px;
-            padding: 5px 10px;
+            font-size: 1.5em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove {
+            margin: 5px 5px;
+            padding: 5px 5px;
             font-size: 1em;
+            width: 120px;
+            height: 60px;
+        }
+
+        .quantity {
+            padding-right: 30px;
+            padding-left: 30px;
+        }
+
+        #total-price-container {
+            width: 100%;
+            text-align: center;
+            padding-top: 3em;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .s-button {
+            width: 300px;
+            height: 180px;
+            font-size: 3em;
+            border-radius: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>상품 스캔</h1>
-    <hr>
-    <table id="item-table">
-        <thead>
-            <tr>
-                <th>상품명</th>
-                <th>가격</th>
-                <th>수량</th>
-                <th>조작</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!--여기에 실시간으로 스캔된 상품이 쭉 나옴-->
-        </tbody>
-    </table>
-    <hr>
-    <div>
-        <strong>총 가격: </strong><span id="total-price">0</span>원
+    <div class="left-side">
+        <table id="item-table">
+            <tbody>
+                <!--여기에 실시간으로 스캔된 상품이 쭉 나옴-->
+            </tbody>
+        </table>
     </div>
-    <hr>
-    <div class="payment-method">
-        <input type="radio" id="creditcard" name="payment_method" value="creditcard" checked>
-        <label for="creditcard">신용카드</label>
-        <input type="radio" id="kakaopay" name="payment_method" value="kakaopay">
-        <label for="kakaopay">카카오페이</label>
-        <input type="radio" id="naverpay" name="payment_method" value="naverpay">
-        <label for="naverpay">네이버페이</label>
+    <div class="right-side">
+        <div id="total-price-container">
+            <strong>합계 : </strong><span id="total-price">0</span>원
+        </div>
+        <div class="payment-method">
+            <h1>결제 방법 선택</h1>
+            <input type="radio" id="creditcard" name="payment_method" value="creditcard" checked>
+            <label for="creditcard">신용카드</label>
+            <input type="radio" id="kakaopay" name="payment_method" value="kakaopay">
+            <label for="kakaopay">카카오페이</label>
+            <input type="radio" id="naverpay" name="payment_method" value="naverpay">
+            <label for="naverpay">네이버페이</label>
+        </div>
+        <form id="payment-form" method="post" action="/customer/pay">
+            <input type="hidden" name="total_price" id="total-price-input">
+            <input type="hidden" name="payment_method" id="payment-method-input">
+            <input type="hidden" name="year" id="year-input">
+            <input type="hidden" name="month" id="month-input">
+            <input type="hidden" name="day" id="day-input">
+            <button type="submit" id="submit-button" class="disabled-button s-button" disabled>결제하기</button>
+        </form>
     </div>
-    <form id="payment-form" method="post" action="/customer/pay">
-        <input type="hidden" name="total_price" id="total-price-input">
-        <input type="hidden" name="payment_method" id="payment-method-input">
-        <input type="hidden" name="year" id="year-input">
-        <input type="hidden" name="month" id="month-input">
-        <input type="hidden" name="day" id="day-input">
-        <button type="submit" id="submit-button" class="disabled-button" disabled>결제하기</button>
-    </form>
 
     <script>
         const socket = io();

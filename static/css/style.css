@@ -1,6 +1,6 @@
 body {
-    background-color: #D9F2D0;
-    background-image: url('/static/images/wallpaper.png');
+    background-color: rgb(254, 255, 217);
+    /* background-image: url('/static/images/wallpaper.png'); */
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -26,6 +26,14 @@ button {
     height: 150px;
     font-size: 30px;
 }
+
+.superbig {
+    width: 500px;
+    height: 400px;
+    font-size: 60px;
+}
+
+
 
 .middle {
     width:150px;

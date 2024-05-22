@@ -4,9 +4,33 @@
     <meta charset="UTF-8">
     <title>편의점 자동 계산 시스템</title>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <style>
+        .scrollable-table {
+            max-height: 400px;
+            overflow-y: auto;
+            width: 100%;
+            table-layout: fixed;
+        }
+        table {
+            border : 1px solid black;
+            border-collapse : collapse;
+            width: 100%;
+            background-color: white;
+        }
+        th, td {
+            border: 1px solid black;
+            width: auto;
+            padding: 1px;
+            text-align: center;
+        }
+        th {
+            background-color: black;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-    <h1>월별 매출 통계</h1>
+    <h1>월별 매출 관리</h1>
     <form method="get" action="/statistics">
         <!-- 년 선택 -->
         <label for="year">년:</label>
@@ -36,7 +60,7 @@
     </form>
     <hr>
 
-    <table id="results-table">
+    <table id="results-table" class="scrollable-table">
         <thead>
             <tr>
                 <th>ID</th>
