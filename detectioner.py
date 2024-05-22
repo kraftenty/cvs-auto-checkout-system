@@ -9,14 +9,15 @@ import threading
 import properties
 
 socketio = None  # SocketIO 인스턴스
-stop_event = threading.Event()  # Event to stop the loop
+stop_event = threading.Event()  # Event 객체 생성
+
+item_list = [False for _ in range(8)]
 
 def init_socketio(app):
     global socketio
     socketio = SocketIO(app)
 
 def detection(stop_event):
-    print('detection 함수 호출됨!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     checkRunningPlatform()
     model = torch.hub.load('ultralytics/yolov5', 'custom', path='best.pt', force_reload=False)
     cap = cv2.VideoCapture(0)
@@ -25,7 +26,7 @@ def detection(stop_event):
         print("[ERROR] Could not open webcam.")
         return
 
-    while not stop_event.is_set():  # Check if the stop event is set
+    while not stop_event.is_set():
         print('loop 도는 중....')
         ret, frame = cap.read()
         if not ret:
@@ -38,15 +39,25 @@ def detection(stop_event):
         if len(results.xyxy[0]) > 0:
             annotated_img = results.render()[0]
             annotated_img = cv2.cvtColor(annotated_img, cv2.COLOR_RGB2BGR)
+            print(results.xyxy[0])
 
+            classes = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}
             for *box, conf, cls in results.xyxy[0]:
-                item = {
-                    'id': int(cls),
-                    'name': properties.getItemName(int(cls)),
-                    'price': properties.getItemPrice(int(cls)),
-                }
-                # 웹소켓을 통해 감지 결과 전송
-                socketio.emit('item', item)
+                classes[int(cls)] += 1
+            
+            # classes 딕셔너리를 순회하면서, value가 1 이상인 아이템을 item 객체로 만들고 웹소켓을 통해 감지 결과 전송한다.
+            for key, value in classes.items():
+                if value > 0:
+                    if item_list[key]:
+                        continue
+                    item_list[key] = True
+                    item = {
+                        'id': key,
+                        'name': properties.getItemName(key),
+                        'price': properties.getItemPrice(key),
+                        'quantity': value
+                    }
+                    socketio.emit('item', item)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -65,7 +76,12 @@ def checkRunningPlatform():
         print('[INFO] WINDOWS에서 실행을 시작합니다.')
 
 def stop_detection():
-    stop_event.set()  # Set the stop event to terminate the loop
+    print('[INFO] detection stopped.')
+    stop_event.set() 
 
 def restart_detection():
-    stop_event.clear()  # Clear the stop event to allow the loop to run
+    print('[INFO] detection restarted.')
+    # 아이템 리스트 초기화
+    global item_list
+    item_list = [False for _ in range(8)]
+    stop_event.clear()

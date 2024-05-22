@@ -156,6 +156,9 @@
             <input type="hidden" name="day" id="day-input">
             <button type="submit" id="submit-button" class="disabled-button s-button" disabled>결제하기</button>
         </form>
+        <br>
+        <br>
+        <a href="/customer/start"><button class="middle">처음으로</button></a>
     </div>
 
     <script>
@@ -182,7 +185,7 @@
             cell2.innerHTML = data.price;
             cell3.innerHTML = `<div class="quantity-control">
                 <button class="decrease" disabled>-</button>
-                <span class="quantity">1</span>
+                <span class="quantity">${data.quantity}</span>
                 <button class="increase">+</button>
             </div>`;
             cell4.innerHTML = '<button class="remove">삭제</button>';

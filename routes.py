@@ -86,6 +86,8 @@ def auth_logout():
 
 @bp.route('/customer/start', methods=['GET'])
 def customer_start():
+    detectioner.stop_detection()
+
     if constant.MANAGER_SESSION in session:
         return render_template('customer/start.html')
     else:
@@ -97,7 +99,7 @@ def customer_scan():
         # 인식 로직을 별도 스레드로 실행
         # 스레드 중복 실행 방지
         if not hasattr(bp, 'detection_thread') or not bp.detection_thread.is_alive():
-            detectioner.restart_detection()  # Restart the detection by clearing the stop event
+            detectioner.restart_detection()
             detection_thread = threading.Thread(target=detectioner.detection, args=(detectioner.stop_event,))
             detection_thread.daemon = True  # 데몬으로 지정
             detection_thread.start()  # 스레드 시작
@@ -108,7 +110,7 @@ def customer_scan():
 
 @bp.route('/customer/pay', methods=['POST'])
 def pay_creditcard():
-    detectioner.stop_detection()  # Correctly stop the detection loop
+    detectioner.stop_detection()
 
     if constant.MANAGER_SESSION in session:
         total_price = request.form['total_price']
