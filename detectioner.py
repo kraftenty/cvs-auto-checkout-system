@@ -58,6 +58,10 @@ def detection(stop_event):
                         'quantity': value
                     }
                     socketio.emit('item', item)
+                    
+            cv2.imshow('Detection', annotated_img)
+        else:
+            cv2.imshow('Detection', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
