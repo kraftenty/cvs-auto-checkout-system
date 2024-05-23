@@ -1,9 +1,9 @@
 # 편의점 자동 계산 시스템
 ## Convenience Store Auto Checkout System
 
-* 실시간으로 계산대 위의 물건을 카메라로 인식하여 자동으로 계산해 주는 시스템입니다.  
-* A system that automatically calculates the items on the counter in real-time using camera recognition.
-  
+* 실시간으로 계산대 위의 물건을 카메라로 인식하여 자동으로 계산해 주는 시스템입니다.    
+* A system that automatically calculates the items on the counter in real-time using camera recognition.  
+* 개발 동기 : 현재 편의점들의 셀프 계산대 방식은 바코드를 일일이 찍어 계산하는 방식으로, 귀찮다는 문제점이 있습니다. 따라서 이를 해결하기 위해 자동 인식 시스템을 개발하게 되었습니다.  
 * 아래 사진을 클릭하면 YouTube 비디오로 이동합니다.
 [![Video Label](http://img.youtube.com/vi/2-c_4o9W3u0/0.jpg)](https://youtu.be/2-c_4o9W3u0)
 
