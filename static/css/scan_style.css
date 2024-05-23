@@ -1,0 +1,119 @@
+body {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent the whole page from scrolling */
+}
+
+.left-side {
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.right-side {
+    padding: 20px;
+    box-sizing: border-box;
+    border-left: 2px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+table, th, td {
+    border: 1px solid gray;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    font-size: 2.5em;
+}
+
+.payment-method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.payment-method input[type="radio"] {
+    display: none;
+}
+
+.payment-method label {
+    margin: 10px 0;
+    padding: 10px 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 2em;
+    width: 100%;
+    text-align: center;
+}
+
+.payment-method input[type="radio"]:checked + label {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.disabled-button {
+    background-color: #cccccc;
+    border-color: #cccccc;
+    cursor: not-allowed;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-control button {
+    font-size: 1.5em;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove {
+    margin: 5px 5px;
+    padding: 5px 5px;
+    font-size: 1em;
+    width: 120px;
+    height: 60px;
+}
+
+.quantity {
+    padding-right: 30px;
+    padding-left: 30px;
+}
+
+#total-price-container {
+    width: 100%;
+    text-align: center;
+    padding-top: 3em;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+}
+
+.s-button {
+    width: 300px;
+    height: 180px;
+    font-size: 3em;
+    border-radius: 20px;
+}
